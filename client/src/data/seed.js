@@ -1,0 +1,168 @@
+export const seedUsers = [
+  {
+    id: 'u1',
+    name: 'Lucy Stone',
+    username: 'lucy123',
+    email: 'lucy@inktalk.com',
+    password: 'lucy123',
+    bio: 'Book lover and weekend reviewer.',
+    website: '',
+    role: 'user',
+    status: 'active',
+    avatar: '',
+    savedBooks: ['b1', 'b2', 'b5'],
+    joined: '2025-03-12',
+  },
+  {
+    id: 'u2',
+    name: 'Admin',
+    username: 'admin',
+    email: 'admin@inktalk.com',
+    password: 'admin123',
+    bio: 'InkTalk administrator',
+    website: '',
+    role: 'admin',
+    status: 'active',
+    avatar: '',
+    savedBooks: [],
+    joined: '2024-01-01',
+  },
+];
+
+export const seedBooks = [
+  {
+    id: 'b1',
+    title: 'The Alchemist',
+    author: 'Paulo Coelho',
+    category: 'Fiction',
+    description:
+      'A shepherd pursues his dream and discovers his personal legend across the desert.',
+    year: 1988,
+    pages: 208,
+    language: 'English',
+    cover:
+      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1654371463i/18144590.jpg',
+    status: 'Published',
+    shopName: 'City Bookshop',
+    shopAddress: '12 Main Street',
+  },
+  {
+    id: 'b2',
+    title: 'Sapiens',
+    author: 'Yuval Noah Harari',
+    category: 'History',
+    description:
+      'A fast-paced history of humankind from hunter-gatherers to the modern world.',
+    year: 2011,
+    pages: 443,
+    language: 'English',
+    cover:
+      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1595674533i/23692271.jpg',
+    status: 'Published',
+    shopName: '',
+    shopAddress: '',
+  },
+  {
+    id: 'b3',
+    title: 'Educated',
+    author: 'Tara Westover',
+    category: 'Memoir',
+    description:
+      'A woman escapes a survivalist upbringing to pursue education.',
+    year: 2018,
+    pages: 334,
+    language: 'English',
+    cover:
+      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1506026635i/35133922.jpg',
+    status: 'Published',
+    shopName: '',
+    shopAddress: '',
+  },
+  {
+    id: 'b4',
+    title: 'The Road',
+    author: 'Cormac McCarthy',
+    category: 'Fiction',
+    description:
+      'A father and son journey through a post-apocalyptic wasteland.',
+    year: 2006,
+    pages: 287,
+    language: 'English',
+    cover:
+      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1320604446i/6288.jpg',
+    status: 'Published',
+    shopName: '',
+    shopAddress: '',
+  },
+  {
+    id: 'b5',
+    title: 'Atomic Habits',
+    author: 'James Clear',
+    category: 'Self-development',
+    description:
+      'Practical advice on building better habits and breaking bad ones, one small change at a time.',
+    year: 2018,
+    pages: 320,
+    language: 'English',
+    cover:
+      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1655988385i/40121378.jpg',
+    status: 'Published',
+    shopName: 'Harbor Books',
+    shopAddress: '88 River Road',
+  },
+  {
+    id: 'b6',
+    title: 'The Midnight Library',
+    author: 'Matt Haig',
+    category: 'Fiction',
+    description:
+      'A woman explores alternate lives in a magical library between life and death.',
+    year: 2020,
+    pages: 304,
+    language: 'English',
+    cover:
+      'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1602190253i/52578297.jpg',
+    status: 'Published',
+    shopName: '',
+    shopAddress: '',
+  },
+];
+
+export const seedReviews = [
+  {
+    id: 'r1',
+    bookId: 'b5',
+    userId: 'u3',
+    username: 'kalifa',
+    rating: 4,
+    text: 'Atomic Habits by James Clear is a truly inspiring book! James clearly outlines the rules for adopting positive habits in a practical, memorable way. I am grateful for this writing.',
+    createdAt: '2026-09-28',
+  },
+  {
+    id: 'r2',
+    bookId: 'b5',
+    userId: 'u4',
+    username: 'Qasim424',
+    rating: 5,
+    text: 'A thoughtful reminder that progress is built in small steps. The examples are clear and easy to apply to everyday routines.',
+    createdAt: '2026-09-30',
+  },
+  {
+    id: 'r3',
+    bookId: 'b1',
+    userId: 'u1',
+    username: 'lucy123',
+    rating: 4,
+    text: 'A warm, simple fable about chasing your personal legend. Short and memorable.',
+    createdAt: '2025-09-14',
+  },
+  {
+    id: 'r4',
+    bookId: 'b2',
+    userId: 'u1',
+    username: 'lucy123',
+    rating: 5,
+    text: 'Ambitious and thought-provoking overview of human history. Hard to put down.',
+    createdAt: '2025-08-21',
+  },
+];
