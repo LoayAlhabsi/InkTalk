@@ -12,15 +12,20 @@ const BooksSlice = createSlice({
         id: `b${Date.now()}`,
         status: 'Published',
         cover: action.payload.cover || '',
+        isbn: action.payload.isbn || '',
+        synopsis: action.payload.synopsis || action.payload.description || '',
         shopName: action.payload.shopName || '',
         shopAddress: action.payload.shopAddress || '',
+        updatedAt: new Date().toISOString().slice(0, 10),
         ...action.payload,
       });
     },
     updateBook: (state, action) => {
       const { id, ...rest } = action.payload;
       state.books = state.books.map((b) =>
-        b.id === id ? { ...b, ...rest } : b
+        b.id === id
+          ? { ...b, ...rest, updatedAt: new Date().toISOString().slice(0, 10) }
+          : b
       );
     },
     deleteBook: (state, action) => {

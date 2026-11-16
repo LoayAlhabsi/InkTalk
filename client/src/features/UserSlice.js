@@ -43,6 +43,12 @@ const UserSlice = createSlice({
       );
 
       if (found) {
+        if (found.status === 'suspended') {
+          state.isSuccess = false;
+          state.isError = true;
+          state.message = 'This account is suspended';
+          return;
+        }
         state.user = stripPassword(found);
         state.isSuccess = true;
         state.isError = false;
@@ -139,6 +145,20 @@ const UserSlice = createSlice({
       state.users = state.users.map((u) =>
         u.id === id ? { ...u, role } : u
       );
+      if (state.user.id === id) {
+        state.user = { ...state.user, role };
+      }
+    },
+    setUserStatus: (state, action) => {
+      const { id, status } = action.payload;
+      const target = state.users.find((u) => u.id === id);
+      if (!target || target.role === 'admin') return;
+      state.users = state.users.map((u) =>
+        u.id === id ? { ...u, status } : u
+      );
+      if (state.user.id === id && status === 'suspended') {
+        state.user = {};
+      }
     },
     resetPassword: (state, action) => {
       const { username, email, password } = action.payload;
@@ -173,6 +193,7 @@ export const {
   toggleSavedBook,
   deleteUser,
   setUserRole,
+  setUserStatus,
   resetPassword,
 } = UserSlice.actions;
 

@@ -136,7 +136,7 @@ const BookDetails = () => {
           <div className="book-details-main">
             <section className="detail-card">
               <h2>Synopsis</h2>
-              <p>{book.description}</p>
+              <p>{book.synopsis || book.description}</p>
               <p className="book-meta-line">
                 Published {book.year} · {book.pages} pages · {book.language}
               </p>

@@ -23,8 +23,16 @@ const ReviewsSlice = createSlice({
     deleteReview: (state, action) => {
       state.reviews = state.reviews.filter((r) => r.id !== action.payload);
     },
+    deleteReviewsByBook: (state, action) => {
+      state.reviews = state.reviews.filter((r) => r.bookId !== action.payload);
+    },
   },
 });
 
-export const { addReview, updateReview, deleteReview } = ReviewsSlice.actions;
+export const {
+  addReview,
+  updateReview,
+  deleteReview,
+  deleteReviewsByBook,
+} = ReviewsSlice.actions;
 export default ReviewsSlice.reducer;
