@@ -1,5 +1,6 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Login from './components/Login';
 import Registration from './components/Registration';
 import ForgotPassword from './components/ForgotPassword';
@@ -9,6 +10,9 @@ import Profile from './components/Profile';
 import AdminBooks from './components/AdminBooks';
 import AdminBookForm from './components/AdminBookForm';
 import AdminUsers from './components/AdminUsers';
+import { fetchUsers } from './features/UserSlice';
+import { fetchBooks } from './features/BooksSlice';
+import { fetchReviews } from './features/ReviewsSlice';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -25,8 +29,15 @@ const AdminRoute = ({ children }) => {
 };
 
 function App() {
+  const dispatch = useDispatch();
   const email = useSelector((state) => state.user.user.email);
   const role = useSelector((state) => state.user.user.role);
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+    dispatch(fetchBooks());
+    dispatch(fetchReviews());
+  }, [dispatch]);
 
   return (
     <BrowserRouter>

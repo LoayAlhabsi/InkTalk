@@ -1019,10 +1019,50 @@
   margin-top: 8px;
 }
 
-.write-review-hint {
-  margin: 0;
-  color: #9ca3af;
-  font-size: 0.88rem;
+.write-review-footer-end {
+  justify-content: flex-end;
+}
+
+.reader-review-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.review-edit-pen {
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  padding: 4px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.review-edit-pen:hover {
+  color: var(--ink-navy, #1f2a44);
+}
+
+.my-review-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.my-shelf-section {
+  margin: 0 0 28px;
+  padding: 22px 24px;
+  background: #fff;
+  border: 1px solid #ebe6dc;
+  border-radius: 16px;
+}
+
+.my-shelf-section .reviews-head {
+  margin-bottom: 16px;
+}
+
+.shelf-grid {
+  margin-top: 8px;
 }
 
 .write-review-footer .btn {

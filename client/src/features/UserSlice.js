@@ -1,200 +1,213 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { seedUsers } from '../data/seed';
+import {createSlice,createAsyncThunk} from '@reduxjs/toolkit';
+import axios from 'axios';
 
-const stripPassword = (user) => {
-  const { password: _pw, ...safe } = user;
-  return safe;
-};
+const API="http://localhost:3003";
 
-const initialState = {
-  user: {},
-  users: seedUsers,
-  isLoading: false,
-  isSuccess: false,
-  isError: false,
-  message: '',
-};
-
-const UserSlice = createSlice({
-  name: 'user',
-  initialState,
-  reducers: {
-    resetStatus: (state) => {
-      state.isLoading = false;
-      state.isSuccess = false;
-      state.isError = false;
-      state.message = '';
-    },
-    logout: (state) => {
-      state.user = {};
-      state.isLoading = false;
-      state.isSuccess = false;
-      state.isError = false;
-      state.message = '';
-    },
-    login: (state, action) => {
-      const { email, password } = action.payload;
-      const key = (email || '').trim().toLowerCase();
-
-      const found = state.users.find(
-        (u) =>
-          (u.email.toLowerCase() === key || u.username.toLowerCase() === key) &&
-          u.password === password
-      );
-
-      if (found) {
-        if (found.status === 'suspended') {
-          state.isSuccess = false;
-          state.isError = true;
-          state.message = 'This account is suspended';
-          return;
-        }
-        state.user = stripPassword(found);
-        state.isSuccess = true;
-        state.isError = false;
-        state.message = 'Login successful';
-        return;
-      }
-
-      // Client-only mock: any Yup-valid email/password signs in as a user
-      const guest = {
-        id: `u${Date.now()}`,
-        name: key.split('@')[0] || 'Reader',
-        username: key.split('@')[0] || 'reader',
-        email: key.includes('@') ? key : `${key}@inktalk.com`,
-        password,
-        bio: '',
-        website: '',
-        savedBooks: [],
-        role: key.includes('admin') ? 'admin' : 'user',
-        status: 'active',
-        avatar: '',
-        joined: new Date().toISOString().slice(0, 10),
-      };
-      state.users.push(guest);
-      state.user = stripPassword(guest);
-      state.isSuccess = true;
-      state.isError = false;
-      state.message = 'Login successful';
-    },
-    register: (state, action) => {
-      const { username, email, password, userType } = action.payload;
-      const exists = state.users.some(
-        (u) =>
-          u.email.toLowerCase() === email.toLowerCase() ||
-          u.username.toLowerCase() === username.toLowerCase()
-      );
-      if (exists) {
-        state.isError = true;
-        state.isSuccess = false;
-        state.message = 'Email or username already registered';
-        return;
-      }
-      const newUser = {
-        id: `u${Date.now()}`,
-        name: username,
-        username,
-        email,
-        password,
-        userType: userType || 'Reader',
-        bio: '',
-        website: '',
-        savedBooks: [],
-        role: 'user',
-        status: 'active',
-        avatar: '',
-        joined: new Date().toISOString().slice(0, 10),
-      };
-      state.users.push(newUser);
-      state.isSuccess = true;
-      state.isError = false;
-      state.message = 'Registration successful';
-    },
-    updateProfile: (state, action) => {
-      if (!state.user.id) return;
-      const { password, cpassword, ...rest } = action.payload;
-      const patch = { ...rest };
-      if (password) patch.password = password;
-      const updated = { ...state.user, ...patch };
-      state.user = updated;
-      state.users = state.users.map((u) =>
-        u.id === updated.id ? { ...u, ...patch } : u
-      );
-      state.isSuccess = true;
-      state.message = 'Profile updated';
-    },
-    toggleSavedBook: (state, action) => {
-      if (!state.user.id) return;
-      const bookId = action.payload;
-      const current = state.user.savedBooks || [];
-      const savedBooks = current.includes(bookId)
-        ? current.filter((id) => id !== bookId)
-        : [...current, bookId];
-      state.user = { ...state.user, savedBooks };
-      state.users = state.users.map((u) =>
-        u.id === state.user.id ? { ...u, savedBooks } : u
-      );
-    },
-    deleteUser: (state, action) => {
-      const id = action.payload;
-      state.users = state.users.filter((u) => u.id !== id);
-      if (state.user.id === id) state.user = {};
-    },
-    setUserRole: (state, action) => {
-      const { id, role } = action.payload;
-      state.users = state.users.map((u) =>
-        u.id === id ? { ...u, role } : u
-      );
-      if (state.user.id === id) {
-        state.user = { ...state.user, role };
-      }
-    },
-    setUserStatus: (state, action) => {
-      const { id, status } = action.payload;
-      const target = state.users.find((u) => u.id === id);
-      if (!target || target.role === 'admin') return;
-      state.users = state.users.map((u) =>
-        u.id === id ? { ...u, status } : u
-      );
-      if (state.user.id === id && status === 'suspended') {
-        state.user = {};
-      }
-    },
-    resetPassword: (state, action) => {
-      const { username, email, password } = action.payload;
-      const keyUser = (username || '').trim().toLowerCase();
-      const keyEmail = (email || '').trim().toLowerCase();
-      const idx = state.users.findIndex(
-        (u) =>
-          u.username.toLowerCase() === keyUser &&
-          u.email.toLowerCase() === keyEmail
-      );
-      if (idx !== -1) {
-        state.users[idx].password = password;
-        state.isSuccess = true;
-        state.isError = false;
-        state.message = 'Password updated';
-      } else {
-        // Client mock: still mark success so the flow can continue
-        state.isSuccess = true;
-        state.isError = false;
-        state.message = 'Password updated';
-      }
-    },
-  },
+export const fetchUsers=createAsyncThunk("user/fetchUsers",async(_,{rejectWithValue})=>{
+    try{
+        const response=await axios.get(`${API}/users`);
+        return response.data;
+    }
+    catch(error){
+        return rejectWithValue(error.response?.data?.message||"Failed to load users");
+    }
 });
 
-export const {
-  resetStatus,
-  logout,
-  login,
-  register,
-  updateProfile,
-  toggleSavedBook,
-  deleteUser,
-  setUserRole,
-  setUserStatus,
-  resetPassword,
-} = UserSlice.actions;
+export const login=createAsyncThunk("user/login",async(udata,{rejectWithValue})=>{
+    try{
+        const response=await axios.post(`${API}/login`,udata);
+        if(response.data.user)
+            return response.data;
+        else
+            return rejectWithValue(response?.data?.message||"Invalid Credentials");
+    }
+    catch(error){
+        return rejectWithValue(error.response?.data?.message||"Invalid Credentials");
+    }
+});
 
+export const register=createAsyncThunk("user/register",async(udata,{rejectWithValue})=>{
+    try{
+        const response=await axios.post(`${API}/register`,udata);
+        if(response.data.message==="Registration successful")
+            return response.data;
+        else
+            return rejectWithValue(response?.data?.message||"Error in Registration");
+    }
+    catch(error){
+        return rejectWithValue(error.response?.data?.message||"Error in Registration");
+    }
+});
+
+export const updateProfile=createAsyncThunk("user/updateProfile",async(payload,{getState,rejectWithValue})=>{
+    try{
+        const id=getState().user.user.id;
+        if(!id) return rejectWithValue("Not logged in");
+        const response=await axios.put(`${API}/users/${id}`,payload);
+        return response.data.user;
+    }
+    catch(error){
+        return rejectWithValue(error.response?.data?.message||"Update failed");
+    }
+});
+
+export const toggleSavedBook=createAsyncThunk("user/toggleSavedBook",async(bookId,{getState,rejectWithValue})=>{
+    try{
+        const id=getState().user.user.id;
+        if(!id) return rejectWithValue("Not logged in");
+        const response=await axios.put(`${API}/users/${id}/saved`,{bookId});
+        return response.data.user;
+    }
+    catch(error){
+        return rejectWithValue(error.response?.data?.message||"Update failed");
+    }
+});
+
+export const deleteUser=createAsyncThunk("user/deleteUser",async(id,{rejectWithValue})=>{
+    try{
+        await axios.delete(`${API}/users/${id}`);
+        return id;
+    }
+    catch(error){
+        return rejectWithValue(error.response?.data?.message||"Delete failed");
+    }
+});
+
+export const setUserRole=createAsyncThunk("user/setUserRole",async({id,role},{rejectWithValue})=>{
+    try{
+        const response=await axios.put(`${API}/users/${id}/role`,{role});
+        return response.data.user;
+    }
+    catch(error){
+        return rejectWithValue(error.response?.data?.message||"Update failed");
+    }
+});
+
+export const setUserStatus=createAsyncThunk("user/setUserStatus",async({id,status},{rejectWithValue})=>{
+    try{
+        const response=await axios.put(`${API}/users/${id}/status`,{status});
+        return response.data.user;
+    }
+    catch(error){
+        return rejectWithValue(error.response?.data?.message||"Update failed");
+    }
+});
+
+export const resetPassword=createAsyncThunk("user/resetPassword",async(udata,{rejectWithValue})=>{
+    try{
+        const response=await axios.post(`${API}/reset-password`,udata);
+        return response.data.message;
+    }
+    catch(error){
+        return rejectWithValue(error.response?.data?.message||"Reset failed");
+    }
+});
+
+const initialState={
+    user:{},
+    users:[],
+    isLoading:false,
+    isSuccess:false,
+    isError:false,
+    message:""
+};
+
+export const UserSlice=createSlice({
+    name:"user",
+    initialState,
+    reducers:{
+        resetStatus:(state)=>{
+            state.isLoading=false;
+            state.isSuccess=false;
+            state.isError=false;
+            state.message="";
+        },
+        logout:(state)=>{
+            state.user={};
+            state.isLoading=false;
+            state.isSuccess=false;
+            state.isError=false;
+            state.message="";
+        }
+    },
+    extraReducers:(builder)=>{
+        builder.addCase(fetchUsers.fulfilled,(state,action)=>{
+            state.users=action.payload;
+        })
+        .addCase(login.pending,(state)=>{
+            state.isLoading=true;
+            state.isError=false;
+            state.isSuccess=false;
+            state.message="";
+        })
+        .addCase(login.fulfilled,(state,action)=>{
+            state.isLoading=false;
+            state.user=action.payload.user;
+            state.message=action.payload.message;
+            state.isSuccess=true;
+            state.isError=false;
+        })
+        .addCase(login.rejected,(state,action)=>{
+            state.isLoading=false;
+            state.user={};
+            state.isError=true;
+            state.isSuccess=false;
+            state.message=action.payload;
+        })
+        .addCase(register.pending,(state)=>{
+            state.isLoading=true;
+            state.isError=false;
+            state.isSuccess=false;
+        })
+        .addCase(register.fulfilled,(state,action)=>{
+            state.isLoading=false;
+            state.message=action.payload.message;
+            state.isSuccess=true;
+            state.isError=false;
+            if(action.payload?.user){
+                state.users.push(action.payload.user);
+            }
+        })
+        .addCase(register.rejected,(state,action)=>{
+            state.isLoading=false;
+            state.isError=true;
+            state.isSuccess=false;
+            state.message=action.payload;
+        })
+        .addCase(updateProfile.fulfilled,(state,action)=>{
+            state.user=action.payload;
+            state.users=state.users.map((u)=>u.id===action.payload.id?action.payload:u);
+            state.isSuccess=true;
+            state.message="Profile updated";
+        })
+        .addCase(toggleSavedBook.fulfilled,(state,action)=>{
+            state.user=action.payload;
+            state.users=state.users.map((u)=>u.id===action.payload.id?action.payload:u);
+        })
+        .addCase(deleteUser.fulfilled,(state,action)=>{
+            state.users=state.users.filter((u)=>u.id!==action.payload);
+            if(state.user.id===action.payload) state.user={};
+        })
+        .addCase(setUserRole.fulfilled,(state,action)=>{
+            state.users=state.users.map((u)=>u.id===action.payload.id?action.payload:u);
+            if(state.user.id===action.payload.id){
+                state.user=action.payload;
+            }
+        })
+        .addCase(setUserStatus.fulfilled,(state,action)=>{
+            if(!action.payload) return;
+            state.users=state.users.map((u)=>u.id===action.payload.id?action.payload:u);
+            if(state.user.id===action.payload.id&&action.payload.status==="suspended"){
+                state.user={};
+            }
+        })
+        .addCase(resetPassword.fulfilled,(state,action)=>{
+            state.isSuccess=true;
+            state.isError=false;
+            state.message=action.payload||"Password updated";
+        });
+    }
+});
+
+export const {resetStatus,logout}=UserSlice.actions;
 export default UserSlice.reducer;

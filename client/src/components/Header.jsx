@@ -39,6 +39,17 @@ const Header = ({
           ) : (
             <>
               <NavLink to="/home">Discover</NavLink>
+              <NavLink
+                to="/home#shelf"
+                onClick={(e) => {
+                  if (window.location.pathname === '/home') {
+                    e.preventDefault();
+                    document.getElementById('my-shelf')?.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                My shelf
+              </NavLink>
               <NavLink to="/profile">My reviews</NavLink>
               {isAdmin && <NavLink to="/admin/books">Admin</NavLink>}
             </>

@@ -123,7 +123,7 @@ const AdminUsers = () => {
           </div>
           <div>
             <strong>{stats.suspended}</strong>
-            <span>Suspended account{stats.suspended === 1 ? '' : 's'}</span>
+            <span>Disabled account{stats.suspended === 1 ? '' : 's'}</span>
           </div>
           <div>
             <strong>{stats.reviews}</strong>
@@ -161,7 +161,7 @@ const AdminUsers = () => {
                 >
                   <option value="all">All statuses</option>
                   <option value="active">Active</option>
-                  <option value="suspended">Suspended</option>
+                  <option value="suspended">Disabled</option>
                 </select>
               </div>
             </div>
@@ -211,7 +211,7 @@ const AdminUsers = () => {
                                   : 'published'
                               }`}
                             >
-                              {u.status === 'suspended' ? 'Suspended' : 'Active'}
+                              {u.status === 'suspended' ? 'Disabled' : 'Active'}
                             </span>
                           </td>
                           <td>
@@ -240,7 +240,7 @@ const AdminUsers = () => {
                                     handleToggleStatus(u);
                                   }}
                                 >
-                                  Restore
+                                  Enable
                                 </button>
                               ) : (
                                 <button
@@ -251,7 +251,7 @@ const AdminUsers = () => {
                                     handleToggleStatus(u);
                                   }}
                                 >
-                                  Suspend
+                                  Disable
                                 </button>
                               )}
                             </div>
@@ -284,7 +284,7 @@ const AdminUsers = () => {
                       selected.status === 'suspended' ? 'suspended' : 'published'
                     }`}
                   >
-                    {selected.status === 'suspended' ? 'Suspended' : 'Active'}
+                    {selected.status === 'suspended' ? 'Disabled' : 'Active'}
                   </span>
                 </div>
                 <p className="admin-selected-email">{selected.email}</p>
@@ -321,7 +321,7 @@ const AdminUsers = () => {
 
                 {isProtected ? (
                   <p className="admin-selected-note protected">
-                    Administrator accounts are protected and cannot be suspended
+                    Administrator accounts are protected and cannot be disabled
                     or reassigned from this panel.
                   </p>
                 ) : (
@@ -336,11 +336,11 @@ const AdminUsers = () => {
                       onClick={() => handleToggleStatus(selected)}
                     >
                       {selected.status === 'suspended'
-                        ? 'Restore account'
-                        : 'Suspend account'}
+                        ? 'Enable account'
+                        : 'Disable account'}
                     </button>
                     <p className="admin-selected-note">
-                      Suspension blocks login and new reviews. Existing reviews
+                      Disable blocks login and new reviews. Existing reviews
                       remain visible on the shelf.
                     </p>
                   </>
@@ -360,7 +360,7 @@ const AdminUsers = () => {
               <h3>Administration notes</h3>
               <p>
                 The administrator account is protected. Role changes and
-                suspensions should be confirmed before applying. These accounts
+                disable actions should be confirmed before applying. These accounts
                 and activity totals are illustrative.
               </p>
             </section>

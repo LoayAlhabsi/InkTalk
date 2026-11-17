@@ -3,7 +3,7 @@ import { Alert } from 'reactstrap';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FaExclamationTriangle, FaTimes } from 'react-icons/fa';
+import { FaTimes } from 'react-icons/fa';
 import Header from './Header';
 import { BookFormValidation } from '../validations/BookFormValidation';
 import { addBook, updateBook, deleteBook } from '../features/BooksSlice';
@@ -53,7 +53,6 @@ const AdminBookForm = ({ mode = 'add' }) => {
   const navigate = useNavigate();
   const coverInputRef = useRef(null);
   const [showDelete, setShowDelete] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState('');
   const [showCoverUrl, setShowCoverUrl] = useState(false);
 
   const existing = useSelector((state) =>
@@ -119,7 +118,6 @@ const AdminBookForm = ({ mode = 'add' }) => {
   };
 
   const confirmDelete = () => {
-    if (deleteConfirm !== 'DELETE') return;
     dispatch(deleteBook(id));
     dispatch(deleteReviewsByBook(id));
     navigate('/admin/books', { replace: true });
@@ -358,10 +356,7 @@ const AdminBookForm = ({ mode = 'add' }) => {
                       <button
                         type="button"
                         className="admin-delete-btn"
-                        onClick={() => {
-                          setDeleteConfirm('');
-                          setShowDelete(true);
-                        }}
+                        onClick={() => setShowDelete(true)}
                       >
                         Delete book
                       </button>
@@ -447,39 +442,20 @@ const AdminBookForm = ({ mode = 'add' }) => {
               >
                 <FaTimes />
               </button>
-              <p className="admin-delete-kicker">
-                <FaExclamationTriangle /> Delete confirmation
-              </p>
-              <h3 id="delete-book-title">Delete {bookTitle}?</h3>
-              <p>
-                This action cannot be undone. The book and its {reviewStats.count} review
-                {reviewStats.count === 1 ? '' : 's'} will be permanently removed. Reader
-                accounts will not be affected.
-              </p>
-              <div className="admin-field">
-                <label htmlFor="delete-confirm">Type DELETE to confirm</label>
-                <input
-                  id="delete-confirm"
-                  className="form-control"
-                  value={deleteConfirm}
-                  onChange={(e) => setDeleteConfirm(e.target.value)}
-                  autoComplete="off"
-                />
-              </div>
+              <h3 id="delete-book-title">Are you sure you want to delete?</h3>
               <button
                 type="button"
                 className="admin-delete-confirm-btn"
-                disabled={deleteConfirm !== 'DELETE'}
                 onClick={confirmDelete}
               >
-                Yes, delete book
+                Yes
               </button>
               <button
                 type="button"
                 className="admin-keep-btn"
                 onClick={() => setShowDelete(false)}
               >
-                Keep book
+                No
               </button>
             </div>
           </div>
